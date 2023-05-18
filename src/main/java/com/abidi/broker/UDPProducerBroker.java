@@ -20,11 +20,14 @@ public class UDPProducerBroker {
     private final DatagramSocket socket;
     private volatile DatagramPacket packet;
 
+    private final byte[] bytes;
+
 
     public UDPProducerBroker(CircularMMFQueue circularMMFQueue, int msgSize) throws SocketException {
         this.circularMMFQueue = circularMMFQueue;
         socket = new DatagramSocket(4445);
-        packet = new DatagramPacket(null, msgSize);
+        bytes = new byte[msgSize];
+        packet = new DatagramPacket(bytes, msgSize);
 
     }
 

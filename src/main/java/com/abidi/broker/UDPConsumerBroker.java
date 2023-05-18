@@ -20,10 +20,14 @@ public class UDPConsumerBroker {
     private final DatagramSocket socket;
     private volatile DatagramPacket packet;
 
+    private final byte[] bytes;
+
+
     public UDPConsumerBroker(CircularMMFQueue circularMMFQueue, int msgSize) throws SocketException {
         this.circularMMFQueue = circularMMFQueue;
-        socket = new DatagramSocket(4445);
-        packet = new DatagramPacket(null, msgSize);
+        socket = new DatagramSocket();
+        bytes = new byte[msgSize];
+        packet = new DatagramPacket(bytes, msgSize);
 
     }
 
@@ -36,7 +40,8 @@ public class UDPConsumerBroker {
         while (true) {
             try {
                 socket.receive(packet);
-                circularMMFQueue.add(packet.getData());
+                if (packet.getData() != null && packet.getData().length > 10)
+                    circularMMFQueue.add(packet.getData());
             } catch (Exception exp) {
                 LOG.error("Failed to receive msg");
             }
