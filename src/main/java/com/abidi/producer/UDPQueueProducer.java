@@ -14,7 +14,7 @@ public class UDPQueueProducer {
 
     private static final Logger LOG = LoggerFactory.getLogger(UDPQueueProducer.class);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         LOG.info("Starting Market Data Generator...");
         MarketData md = new MarketData();

@@ -4,9 +4,7 @@ import com.abidi.queue.CircularMMFQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
+import java.net.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -23,9 +21,9 @@ public class UDPConsumerBroker {
     private final byte[] bytes;
 
 
-    public UDPConsumerBroker(CircularMMFQueue circularMMFQueue, int msgSize) throws SocketException {
+    public UDPConsumerBroker(CircularMMFQueue circularMMFQueue, int msgSize) throws SocketException, UnknownHostException {
         this.circularMMFQueue = circularMMFQueue;
-        socket = new DatagramSocket();
+        socket = new DatagramSocket(5000, InetAddress.getLocalHost());
         bytes = new byte[msgSize];
         packet = new DatagramPacket(bytes, msgSize);
 
