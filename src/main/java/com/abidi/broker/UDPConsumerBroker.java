@@ -11,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
 import static java.net.InetAddress.getLocalHost;
 
 public class UDPConsumerBroker {
@@ -24,7 +25,11 @@ public class UDPConsumerBroker {
     private final byte[] ackMsgSeq = new byte[8];
 
     private final DatagramPacket ackPacket;
-    private long seq = 0;
+
+    private MarketDataCons marketDataCons = new MarketDataCons();
+
+
+    private long msgCount = 0;
 
 
     public static void main(String[] args) throws IOException {
@@ -35,7 +40,7 @@ public class UDPConsumerBroker {
 
     public UDPConsumerBroker(int msgSize) throws IOException {
 
-        this.circularMMFQueue = new CircularMMFQueue(msgSize, 10, "/tmp");
+        this.circularMMFQueue = new CircularMMFQueue(msgSize, QUEUE_SIZE, "/tmp");
         socket = new DatagramSocket(5000, InetAddress.getLocalHost());
         bytes = new byte[msgSize];
         packet = new DatagramPacket(bytes, msgSize, InetAddress.getLocalHost(), 5001);
@@ -46,7 +51,6 @@ public class UDPConsumerBroker {
 
     private void process() {
 
-        MarketDataCons marketDataCons = new MarketDataCons();
         while (true) {
             try {
                 socket.receive(packet);
@@ -55,8 +59,10 @@ public class UDPConsumerBroker {
                     ackPacket.setData(ByteUtils.longToBytes(marketDataCons.getId()));
 
                     if (circularMMFQueue.add(packet.getData())) {
+                        LOG.debug("{} Msg enqueued {}, sending ack", ++msgCount, marketDataCons);
                         socket.send(ackPacket);
-                        LOG.info("Msg enqueued {}", marketDataCons);
+                    } else {
+                        LOG.info("Can't accept msg, queue is full");
                     }
                 }
             } catch (Exception exp) {

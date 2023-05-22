@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
 
+import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
 import static com.abidi.util.ByteUtils.bytesToLong;
 import static com.abidi.util.ByteUtils.longToBytes;
 import static java.net.InetAddress.getLocalHost;
@@ -36,7 +37,7 @@ public class UDPProducerBroker {
     }
 
     public UDPProducerBroker(int msgSize) throws IOException {
-        this.circularMMFQueue = new CircularMMFQueue(msgSize, 10, "/home/mesum");
+        this.circularMMFQueue = new CircularMMFQueue(msgSize, QUEUE_SIZE, "/home/mesum");
         socket = new DatagramSocket(5001);
         socket.setSoTimeout(5000);
         bytes = new byte[msgSize];
@@ -47,7 +48,7 @@ public class UDPProducerBroker {
     private void process() {
 
         while (true) {
-            byte[] bytes = circularMMFQueue.get();
+            byte[] bytes = circularMMFQueue.getWithoutAck();
             if (bytes != null) sendItAcross(bytes);
         }
     }
@@ -61,10 +62,12 @@ public class UDPProducerBroker {
         while (true) {
             try {
 
-                LOG.info("Sending data {}", marketDataCons);
+                LOG.debug("Sending data {}", marketDataCons);
                 socket.send(packet);
                 socket.receive(ackPacket);
                 if (bytesToLong(ackPacket.getData(), 0, 8) == marketDataCons.getId()) {
+                    LOG.debug("Ack for {} is received", marketDataCons.getId());
+                    circularMMFQueue.ack();
                     break;
                 }
 
