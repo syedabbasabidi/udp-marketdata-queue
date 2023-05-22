@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
+
 public class UDPQueueProducer {
 
     private static final Logger LOG = LoggerFactory.getLogger(UDPQueueProducer.class);
@@ -15,10 +17,10 @@ public class UDPQueueProducer {
 
         LOG.info("Starting Market Data Generator...");
         MarketData md = new MarketData();
-        CircularMMFQueue mmfQueue = new CircularMMFQueue(md.size(), 10, "/home/mesum");
-        mmfQueue.reset();
+        CircularMMFQueue mmfQueue = new CircularMMFQueue(md.size(), QUEUE_SIZE, "/home/mesum");
 
-        int j = 0;
+        LOG.info("Sending MD messages...");
+        int j = 1;
         md.set("GB00BJLR0J16", 1d + j, 0, true, (byte) 1, "BRC", "2023-02-14:22:10:13", j);
         while (true) {
             md.setPrice(1d + j);
@@ -26,10 +28,14 @@ public class UDPQueueProducer {
             md.setFirm(j % 2 == 0);
             md.setId(j);
             boolean added = mmfQueue.add(md.getData());
-            j = added ? j + 1 : j;
-            if (added)
-                LOG.info("Adding to queue {}", j);
-
+            if (added) {
+                LOG.debug("Enqueued {}", j);
+                j++;
+            }
+            if (j > 1_000_000) {
+                LOG.info("Sent all {} messages", QUEUE_SIZE);
+                break;
+            }
         }
     }
 }
