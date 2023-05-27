@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketTimeoutException;
 
 import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
 import static com.abidi.util.ByteUtils.bytesToLong;
@@ -23,12 +22,12 @@ public class UDPProducerBroker {
 
     private final DatagramSocket socket;
     private final DatagramPacket ackPacket;
-    private volatile DatagramPacket packet;
+    private volatile DatagramPacket msgPacket;
 
     private final byte[] bytes;
     private final byte[] ackMsgSeq = new byte[8];
+    private MarketDataCons marketDataCons = new MarketDataCons();
 
-    private long seq = 0;
 
     public static void main(String[] args) throws IOException {
         MarketData marketData = new MarketData();
@@ -41,7 +40,7 @@ public class UDPProducerBroker {
         socket = new DatagramSocket(5001);
         socket.setSoTimeout(5000);
         bytes = new byte[msgSize];
-        packet = new DatagramPacket(bytes, msgSize, getLocalHost(), 5000);
+        msgPacket = new DatagramPacket(bytes, msgSize, getLocalHost(), 5000);
         ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), 5000);
     }
 
@@ -54,28 +53,34 @@ public class UDPProducerBroker {
     }
 
     private void sendItAcross(byte[] bytes) {
-        packet.setData(bytes);
-        MarketDataCons marketDataCons = new MarketDataCons();
+
+        msgPacket.setData(bytes);
         marketDataCons.setData(bytes);
-        ackPacket.setData(longToBytes(marketDataCons.getId()));
+        ackPacket.setData(extractMsgId());
 
         while (true) {
             try {
 
-                LOG.debug("Sending data {}", marketDataCons);
-                socket.send(packet);
+                LOG.info("Sending data {}", marketDataCons);
+                socket.send(msgPacket);
                 socket.receive(ackPacket);
-                if (bytesToLong(ackPacket.getData(), 0, 8) == marketDataCons.getId()) {
-                    LOG.debug("Ack for {} is received", marketDataCons.getId());
+                if (idFromAck() == marketDataCons.getId()) {
+                    LOG.info("Ack for {} is received", marketDataCons.getId());
                     circularMMFQueue.ack();
                     break;
                 }
 
-            } catch (SocketTimeoutException exp) {
-                LOG.info("Failed to send seq {}, will retry", seq);
-            } catch (Exception exp) {
-                LOG.error("Failed to send msg", exp);
+            } catch (IOException exp) {
+                LOG.info("Failed to send msg {}, will retry", marketDataCons.getId());
             }
         }
+    }
+
+    private byte[] extractMsgId() {
+        return longToBytes(marketDataCons.getId());
+    }
+
+    private long idFromAck() {
+        return bytesToLong(ackPacket.getData(), 0, 8);
     }
 }

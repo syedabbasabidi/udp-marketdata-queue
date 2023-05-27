@@ -27,14 +27,8 @@ public class UDPQueueProducer {
             md.side(j % 2 == 0 ? 0 : 1);
             md.setFirm(j % 2 == 0);
             md.setId(j);
-            boolean added = mmfQueue.add(md.getData());
-            if (added) {
-                LOG.debug("Enqueued {}", j);
-                j++;
-            }
-            if (j > 1_000_000) {
-                LOG.info("Sent all {} messages", QUEUE_SIZE);
-                break;
+            if (mmfQueue.add(md.getData())) {
+                LOG.info("Msg {} sent", j++);
             }
         }
     }

@@ -59,7 +59,7 @@ public class UDPConsumerBroker {
                     ackPacket.setData(ByteUtils.longToBytes(marketDataCons.getId()));
 
                     if (circularMMFQueue.add(packet.getData())) {
-                        LOG.debug("{} Msg enqueued {}, sending ack", ++msgCount, marketDataCons);
+                        LOG.info("{} Msg enqueued {}, sending ack", ++msgCount, marketDataCons);
                         socket.send(ackPacket);
                     } else {
                         LOG.info("Can't accept msg, queue is full");

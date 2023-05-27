@@ -12,9 +12,8 @@ public class UDPQueueConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(UDPQueueProducer.class);
     private static final MarketDataCons marketData = new MarketDataCons();
-    private long msgCount = 0;
 
-    public static final int QUEUE_SIZE = 2000_000;
+    public static final int QUEUE_SIZE = 100;
 
     public static void main(String[] args) throws IOException {
         CircularMMFQueue mmfQueue = new CircularMMFQueue(marketData.size(), QUEUE_SIZE, "/tmp");
@@ -28,13 +27,7 @@ public class UDPQueueConsumer {
         while (true) {
             byte[] bytes = mmfQueue.get();
             if (bytes != null) {
-                msgCount++;//process(marketData, bytes);
-                if (msgCount == 1) LOG.info("First msg arrived");
-            }
-
-            if (msgCount >= 1_000_000) {
-                LOG.info("All messages consumed");
-                break;
+                process(marketData, bytes);
             }
         }
     }
@@ -42,6 +35,6 @@ public class UDPQueueConsumer {
 
     private static void process(MarketDataCons marketData, byte[] data) {
         marketData.setData(data);
-        LOG.debug("Message received {}", marketData);
+        LOG.info("Message received {}", marketData);
     }
 }
