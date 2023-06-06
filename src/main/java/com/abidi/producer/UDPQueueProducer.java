@@ -17,7 +17,7 @@ public class UDPQueueProducer {
 
         LOG.info("Starting Market Data Generator...");
         MarketData md = new MarketData();
-        CircularMMFQueue mmfQueue = new CircularMMFQueue(md.size(), QUEUE_SIZE, "/home/mesum");
+        CircularMMFQueue mmfQueue = new CircularMMFQueue(md.size(), QUEUE_SIZE, "/tmp/producer");
 
         LOG.info("Sending MD messages...");
         int j = 1;
@@ -28,7 +28,7 @@ public class UDPQueueProducer {
             md.setFirm(j % 2 == 0);
             md.setId(j);
             if (mmfQueue.add(md.getData())) {
-                LOG.info("Msg {} sent", j++);
+                LOG.debug("Msg {} sent", j++);
             }
         }
     }

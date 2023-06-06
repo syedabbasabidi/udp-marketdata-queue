@@ -40,7 +40,7 @@ public class UDPConsumerBroker {
 
     public UDPConsumerBroker(int msgSize) throws IOException {
 
-        this.circularMMFQueue = new CircularMMFQueue(msgSize, QUEUE_SIZE, "/tmp");
+        this.circularMMFQueue = new CircularMMFQueue(msgSize, QUEUE_SIZE, "/tmp/consumer");
         socket = new DatagramSocket(5000, InetAddress.getLocalHost());
         bytes = new byte[msgSize];
         packet = new DatagramPacket(bytes, msgSize, InetAddress.getLocalHost(), 5001);

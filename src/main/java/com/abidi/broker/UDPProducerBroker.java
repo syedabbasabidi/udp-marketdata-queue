@@ -36,7 +36,7 @@ public class UDPProducerBroker {
     }
 
     public UDPProducerBroker(int msgSize) throws IOException {
-        this.circularMMFQueue = new CircularMMFQueue(msgSize, QUEUE_SIZE, "/home/mesum");
+        this.circularMMFQueue = new CircularMMFQueue(msgSize, QUEUE_SIZE, "/tmp/producer");
         socket = new DatagramSocket(5001);
         socket.setSoTimeout(5000);
         bytes = new byte[msgSize];

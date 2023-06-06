@@ -13,10 +13,10 @@ public class UDPQueueConsumer {
     private static final Logger LOG = LoggerFactory.getLogger(UDPQueueProducer.class);
     private static final MarketDataCons marketData = new MarketDataCons();
 
-    public static final int QUEUE_SIZE = 100;
+    public static final int QUEUE_SIZE = 1_000_000;
 
     public static void main(String[] args) throws IOException {
-        CircularMMFQueue mmfQueue = new CircularMMFQueue(marketData.size(), QUEUE_SIZE, "/tmp");
+        CircularMMFQueue mmfQueue = new CircularMMFQueue(marketData.size(), QUEUE_SIZE, "/tmp/consumer");
         UDPQueueConsumer udpQueueConsumer = new UDPQueueConsumer();
         udpQueueConsumer.run(mmfQueue);
     }
@@ -32,8 +32,7 @@ public class UDPQueueConsumer {
         }
     }
 
-
-    private static void process(MarketDataCons marketData, byte[] data) {
+    private void process(MarketDataCons marketData, byte[] data) {
         marketData.setData(data);
         LOG.info("Message received {}", marketData);
     }
