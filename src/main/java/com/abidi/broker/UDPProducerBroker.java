@@ -47,9 +47,13 @@ public class UDPProducerBroker {
     private void process() {
 
         while (true) {
-            byte[] bytes = circularMMFQueue.getWithoutAck();
-            if (bytes != null) sendItAcross(bytes);
+            sendNext();
         }
+    }
+
+    public void sendNext() {
+        byte[] bytes = circularMMFQueue.getWithoutAck();
+        if (bytes != null) sendItAcross(bytes);
     }
 
     private void sendItAcross(byte[] bytes) {
