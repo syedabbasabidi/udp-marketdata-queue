@@ -11,29 +11,30 @@ import java.io.IOException;
 public class UDPQueueConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(UDPQueueProducer.class);
-    private static final MarketDataCons marketData = new MarketDataCons();
-
     public static final int QUEUE_SIZE = 1_000_000;
+    private final MarketDataCons marketData;
+    private final CircularMMFQueue mmfQueue;
 
-    public static void main(String[] args) throws IOException {
-        CircularMMFQueue mmfQueue = new CircularMMFQueue(marketData.size(), QUEUE_SIZE, "/tmp/consumer");
-        UDPQueueConsumer udpQueueConsumer = new UDPQueueConsumer();
-        udpQueueConsumer.run(mmfQueue);
+    public UDPQueueConsumer() throws IOException {
+        marketData = new MarketDataCons();
+        mmfQueue = new CircularMMFQueue(marketData.size(), QUEUE_SIZE, "/tmp/consumer");
     }
 
-    public void run(CircularMMFQueue mmfQueue) {
+    public static void main(String[] args) throws IOException {
+        LOG.info("Starting Market Data Consumer...");
+        UDPQueueConsumer udpQueueConsumer = new UDPQueueConsumer();
+        udpQueueConsumer.consume();
+    }
+
+    public void consume() {
 
         LOG.info("Reading to consume");
         while (true) {
             byte[] bytes = mmfQueue.get();
             if (bytes != null) {
-                process(marketData, bytes);
+                marketData.setData(bytes);
+                LOG.debug("Message received {}", marketData);
             }
         }
-    }
-
-    private void process(MarketDataCons marketData, byte[] data) {
-        marketData.setData(data);
-        LOG.info("Message received {}", marketData);
     }
 }

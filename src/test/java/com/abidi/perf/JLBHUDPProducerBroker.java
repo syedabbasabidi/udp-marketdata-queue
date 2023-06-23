@@ -43,7 +43,7 @@ public class JLBHUDPProducerBroker implements JLBHTask {
         try {
             udpProducerBroker = new UDPProducerBroker(md.size());
             CircularMMFQueue circularMMFQueue = getInstance(md.size(), "/tmp/producer");
-            producerThread = new Thread(() -> {
+            producerThread = new Thread(() -> { 
                 while (true) {
                     md.setPrice(++price);
                     md.setId(id++);
@@ -60,7 +60,7 @@ public class JLBHUDPProducerBroker implements JLBHTask {
 
     @Override
     public void run(long startTimeNS) {
-        jlbh.sampleNanos((nanoTime() - 10) - startTimeNS);
         udpProducerBroker.sendNext();
+        jlbh.sampleNanos((nanoTime() - 10) - startTimeNS);
     }
 }
