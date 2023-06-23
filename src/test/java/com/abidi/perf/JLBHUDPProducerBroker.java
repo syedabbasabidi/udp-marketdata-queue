@@ -41,9 +41,9 @@ public class JLBHUDPProducerBroker implements JLBHTask {
 
         md.set("GB00BJLR0J16", 101.12d, 1, true, (byte) 1, "BRC", "2022-09-14:22:10:13", id);
         try {
-            udpProducerBroker = new UDPProducerBroker(md.size());
+            udpProducerBroker = new UDPProducerBroker();
             CircularMMFQueue circularMMFQueue = getInstance(md.size(), "/tmp/producer");
-            producerThread = new Thread(() -> { 
+            producerThread = new Thread(() -> {
                 while (true) {
                     md.setPrice(++price);
                     md.setId(id++);

@@ -1,6 +1,5 @@
 package com.abidi.broker;
 
-import com.abidi.marketdata.model.MarketData;
 import com.abidi.marketdata.model.MarketDataCons;
 import com.abidi.queue.CircularMMFQueue;
 import org.slf4j.Logger;
@@ -19,7 +18,6 @@ public class UDPProducerBroker {
 
     private static final Logger LOG = getLogger(UDPProducerBroker.class);
     private final CircularMMFQueue circularMMFQueue;
-
     private final DatagramSocket socket;
     private final DatagramPacket ackPacket;
     private volatile DatagramPacket msgPacket;
@@ -28,24 +26,21 @@ public class UDPProducerBroker {
     private final byte[] ackMsgSeq = new byte[8];
     private MarketDataCons marketDataCons = new MarketDataCons();
 
-
-    public static void main(String[] args) throws IOException {
-        MarketData marketData = new MarketData();
-        UDPProducerBroker udpProducerBroker = new UDPProducerBroker(marketData.size());
-        udpProducerBroker.process();
-    }
-
-    public UDPProducerBroker(int msgSize) throws IOException {
-        this.circularMMFQueue = new CircularMMFQueue(msgSize, QUEUE_SIZE, "/tmp/producer");
+    public UDPProducerBroker() throws IOException {
+        this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/producer");
         socket = new DatagramSocket(5001);
         socket.setSoTimeout(5000);
-        bytes = new byte[msgSize];
-        msgPacket = new DatagramPacket(bytes, msgSize, getLocalHost(), 5000);
+        bytes = new byte[marketDataCons.size()];
+        msgPacket = new DatagramPacket(bytes, marketDataCons.size(), getLocalHost(), 5000);
         ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), 5000);
     }
 
-    private void process() {
+    public static void main(String[] args) throws IOException {
+        UDPProducerBroker udpProducerBroker = new UDPProducerBroker();
+        udpProducerBroker.startBroker();
+    }
 
+    public void startBroker() {
         while (true) {
             sendNext();
         }

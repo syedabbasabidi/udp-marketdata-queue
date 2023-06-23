@@ -18,47 +18,39 @@ public class UDPConsumerBroker {
 
     private static final Logger LOG = LoggerFactory.getLogger(UDPConsumerBroker.class);
     private final CircularMMFQueue circularMMFQueue;
-
     private final DatagramSocket socket;
-    private volatile DatagramPacket packet;
+    private volatile DatagramPacket mdPacket;
     private final byte[] bytes;
     private final byte[] ackMsgSeq = new byte[8];
-
     private final DatagramPacket ackPacket;
-
     private MarketDataCons marketDataCons = new MarketDataCons();
-
-
     private long msgCount = 0;
 
 
+    public UDPConsumerBroker() throws IOException {
+
+        this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/consumer");
+        socket = new DatagramSocket(5000, InetAddress.getLocalHost());
+        bytes = new byte[marketDataCons.size()];
+        mdPacket = new DatagramPacket(bytes, marketDataCons.size(), InetAddress.getLocalHost(), 5001);
+        ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), 5001);
+    }
+
     public static void main(String[] args) throws IOException {
-        MarketDataCons marketDataCons = new MarketDataCons();
-        UDPConsumerBroker udpConsumerBroker = new UDPConsumerBroker(marketDataCons.size());
+        UDPConsumerBroker udpConsumerBroker = new UDPConsumerBroker();
         udpConsumerBroker.process();
     }
 
-    public UDPConsumerBroker(int msgSize) throws IOException {
-
-        this.circularMMFQueue = new CircularMMFQueue(msgSize, QUEUE_SIZE, "/tmp/consumer");
-        socket = new DatagramSocket(5000, InetAddress.getLocalHost());
-        bytes = new byte[msgSize];
-        packet = new DatagramPacket(bytes, msgSize, InetAddress.getLocalHost(), 5001);
-        ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), 5001);
-
-
-    }
-
-    private void process() {
+    public void process() {
 
         while (true) {
             try {
-                socket.receive(packet);
-                if (packet.getData() != null && packet.getData().length > 10) {
-                    marketDataCons.setData(packet.getData());
+                socket.receive(mdPacket);
+                if (mdPacket.getData() != null && mdPacket.getData().length == marketDataCons.size()) {
+                    marketDataCons.setData(mdPacket.getData());
                     ackPacket.setData(ByteUtils.longToBytes(marketDataCons.getId()));
 
-                    if (circularMMFQueue.add(packet.getData())) {
+                    if (circularMMFQueue.add(mdPacket.getData())) {
                         LOG.info("{} Msg enqueued {}, sending ack", ++msgCount, marketDataCons);
                         socket.send(ackPacket);
                     } else {
