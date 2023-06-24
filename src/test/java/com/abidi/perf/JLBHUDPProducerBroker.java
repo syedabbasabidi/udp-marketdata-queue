@@ -1,8 +1,9 @@
 package com.abidi.perf;
 
+import com.abidi.broker.UDPConsumerBroker;
 import com.abidi.broker.UDPProducerBroker;
-import com.abidi.marketdata.model.MarketData;
-import com.abidi.queue.CircularMMFQueue;
+import com.abidi.consumer.UDPQueueConsumer;
+import com.abidi.producer.UDPQueueProducer;
 import net.openhft.chronicle.jlbh.JLBH;
 import net.openhft.chronicle.jlbh.JLBHOptions;
 import net.openhft.chronicle.jlbh.JLBHTask;
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static com.abidi.queue.CircularMMFQueue.getInstance;
 import static java.lang.System.nanoTime;
 
 public class JLBHUDPProducerBroker implements JLBHTask {
@@ -20,16 +20,15 @@ public class JLBHUDPProducerBroker implements JLBHTask {
 
     private JLBH jlbh;
     private UDPProducerBroker udpProducerBroker;
-    private Thread producerThread;
-
-    private int id;
-    private double price = 0;
+    private UDPQueueConsumer udpQueueConsumer;
+    private UDPConsumerBroker udpConsumerBroker;
+    private UDPQueueProducer udpQueueProducer;
 
 
     public static void main(String[] args) {
         JLBHOptions jlbhOptions = new JLBHOptions()
-                .warmUpIterations(10_000).iterations(5_000_000).throughput(1_000_000).runs(3).accountForCoordinatedOmission(false)
-                .recordOSJitter(false).jlbhTask(new JLBHUDPProducerBroker());
+                .warmUpIterations(10_000).iterations(5_000_000).throughput(1_000_000).runs(3)
+                .accountForCoordinatedOmission(false).recordOSJitter(false).jlbhTask(new JLBHUDPProducerBroker());
 
         new JLBH(jlbhOptions).start();
     }
@@ -37,23 +36,17 @@ public class JLBHUDPProducerBroker implements JLBHTask {
     @Override
     public void init(JLBH jlbh) {
         this.jlbh = jlbh;
-        MarketData md = new MarketData();
-
-        md.set("GB00BJLR0J16", 101.12d, 1, true, (byte) 1, "BRC", "2022-09-14:22:10:13", id);
         try {
+            udpConsumerBroker = new UDPConsumerBroker();
             udpProducerBroker = new UDPProducerBroker();
-            CircularMMFQueue circularMMFQueue = getInstance(md.size(), "/tmp/producer");
-            producerThread = new Thread(() -> {
-                while (true) {
-                    md.setPrice(++price);
-                    md.setId(id++);
-                    circularMMFQueue.add(md.getData());
-                }
-            });
-            producerThread.start();
+            udpQueueConsumer = new UDPQueueConsumer();
+            udpQueueProducer = new UDPQueueProducer();
 
+            udpQueueProducer.produce();
+            udpConsumerBroker.process();
+            udpQueueConsumer.consume();
         } catch (IOException exp) {
-            LOG.error("Failed to init jlbh test", exp);
+            LOG.error("Failed to initialize JLBH", exp);
         }
     }
 
