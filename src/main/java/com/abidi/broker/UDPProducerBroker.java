@@ -2,6 +2,7 @@ package com.abidi.broker;
 
 import com.abidi.marketdata.model.MarketDataCons;
 import com.abidi.queue.CircularMMFQueue;
+import com.abidi.util.ByteUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -9,8 +10,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
-import static com.abidi.util.ByteUtils.bytesToLong;
-import static com.abidi.util.ByteUtils.longToBytes;
 import static java.net.InetAddress.getLocalHost;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -21,12 +20,13 @@ public class UDPProducerBroker {
     private final DatagramSocket socket;
     private final DatagramPacket ackPacket;
     private volatile DatagramPacket msgPacket;
-
     private final byte[] bytes;
     private final byte[] ackMsgSeq = new byte[8];
-    private MarketDataCons marketDataCons = new MarketDataCons();
+    private final ByteUtils byteUtils = new ByteUtils();
+    private MarketDataCons marketDataCons;
 
     public UDPProducerBroker() throws IOException {
+        marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/producer");
         socket = new DatagramSocket(5001);
         socket.setSoTimeout(5000);
@@ -76,10 +76,10 @@ public class UDPProducerBroker {
     }
 
     private byte[] extractMsgId() {
-        return longToBytes(marketDataCons.getId());
+        return byteUtils.longToBytes(marketDataCons.getId());
     }
 
     private long idFromAck() {
-        return bytesToLong(ackPacket.getData(), 0, 8);
+        return byteUtils.bytesToLong(ackPacket.getData(), 0, 8);
     }
 }

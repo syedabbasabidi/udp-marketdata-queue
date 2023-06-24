@@ -23,12 +23,13 @@ public class UDPConsumerBroker {
     private final byte[] bytes;
     private final byte[] ackMsgSeq = new byte[8];
     private final DatagramPacket ackPacket;
-    private MarketDataCons marketDataCons = new MarketDataCons();
+    private final MarketDataCons marketDataCons;
     private long msgCount = 0;
-
+    private final ByteUtils byteUtils = new ByteUtils();
 
     public UDPConsumerBroker() throws IOException {
 
+        marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/consumer");
         socket = new DatagramSocket(5000, InetAddress.getLocalHost());
         bytes = new byte[marketDataCons.size()];
@@ -46,9 +47,9 @@ public class UDPConsumerBroker {
         while (true) {
             try {
                 socket.receive(mdPacket);
-                if (mdPacket.getData() != null && mdPacket.getData().length == marketDataCons.size()) {
+                if (mdPacket.getData() != null) {
                     marketDataCons.setData(mdPacket.getData());
-                    ackPacket.setData(ByteUtils.longToBytes(marketDataCons.getId()));
+                    ackPacket.setData(byteUtils.longToBytes(marketDataCons.getId()));
 
                     if (circularMMFQueue.add(mdPacket.getData())) {
                         LOG.info("{} Msg enqueued {}, sending ack", ++msgCount, marketDataCons);
@@ -58,7 +59,7 @@ public class UDPConsumerBroker {
                     }
                 }
             } catch (Exception exp) {
-                LOG.error("Failed to receive msg");
+                LOG.error("Failed to receive msg", exp);
             }
         }
     }

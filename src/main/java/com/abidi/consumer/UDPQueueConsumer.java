@@ -3,6 +3,7 @@ package com.abidi.consumer;
 import com.abidi.marketdata.model.MarketDataCons;
 import com.abidi.producer.UDPQueueProducer;
 import com.abidi.queue.CircularMMFQueue;
+import com.abidi.util.ByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,8 @@ public class UDPQueueConsumer {
     private final CircularMMFQueue mmfQueue;
 
     public UDPQueueConsumer() throws IOException {
-        marketData = new MarketDataCons();
+        ByteUtils byteUtils = new ByteUtils();
+        marketData = new MarketDataCons(byteUtils);
         mmfQueue = new CircularMMFQueue(marketData.size(), QUEUE_SIZE, "/tmp/consumer");
     }
 
@@ -33,7 +35,7 @@ public class UDPQueueConsumer {
             byte[] bytes = mmfQueue.get();
             if (bytes != null) {
                 marketData.setData(bytes);
-                LOG.debug("Message received {}", marketData);
+                LOG.info("Message received {}", marketData);
             }
         }
     }

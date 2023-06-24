@@ -41,19 +41,23 @@ public class JLBHUDPProducerBroker implements JLBHTask {
             udpProducerBroker = new UDPProducerBroker();
             udpQueueConsumer = new UDPQueueConsumer();
             udpQueueProducer = new UDPQueueProducer();
-
-            udpQueueProducer.produce();
-            udpConsumerBroker.process();
-            udpQueueConsumer.consume();
+            initialize();
         } catch (IOException exp) {
             LOG.error("Failed to initialize JLBH", exp);
         }
     }
-
 
     @Override
     public void run(long startTimeNS) {
         udpProducerBroker.sendNext();
         jlbh.sampleNanos((nanoTime() - 10) - startTimeNS);
     }
+
+
+    private void initialize() {
+        new Thread(() -> udpQueueProducer.produce()).start();
+        new Thread(() -> udpQueueConsumer.consume()).start();
+        new Thread(() -> udpConsumerBroker.process()).start();
+    }
+
 }

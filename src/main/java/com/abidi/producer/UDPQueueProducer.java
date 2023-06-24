@@ -2,6 +2,7 @@ package com.abidi.producer;
 
 import com.abidi.marketdata.model.MarketData;
 import com.abidi.queue.CircularMMFQueue;
+import com.abidi.util.ByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +16,10 @@ public class UDPQueueProducer {
     private final CircularMMFQueue mmfQueue;
     private final MarketData md;
 
+
     public UDPQueueProducer() throws IOException {
-        md = new MarketData();
+        ByteUtils byteUtils = new ByteUtils();
+        md = new MarketData(byteUtils);
         mmfQueue = new CircularMMFQueue(md.size(), QUEUE_SIZE, "/tmp/producer");
     }
 
@@ -37,8 +40,8 @@ public class UDPQueueProducer {
             md.setFirm(msgId % 2 == 0);
             md.setId(msgId);
             if (mmfQueue.add(md.getData())) {
+                LOG.info("Msg {} sent", msgId);
                 msgId++;
-                LOG.debug("Msg {} sent", msgId);
             }
         }
     }
