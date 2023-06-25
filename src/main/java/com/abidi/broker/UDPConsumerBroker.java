@@ -39,10 +39,10 @@ public class UDPConsumerBroker {
 
     public static void main(String[] args) throws IOException {
         UDPConsumerBroker udpConsumerBroker = new UDPConsumerBroker();
-        udpConsumerBroker.process();
+        udpConsumerBroker.startBroker();
     }
 
-    public void process() {
+    public void startBroker() {
 
         while (true) {
             getNextAndAck();

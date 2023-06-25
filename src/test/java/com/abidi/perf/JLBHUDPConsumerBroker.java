@@ -14,9 +14,9 @@ import java.io.IOException;
 
 import static java.lang.System.nanoTime;
 
-public class JLBHUDPProducerBroker implements JLBHTask {
+public class JLBHUDPConsumerBroker implements JLBHTask {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JLBHUDPProducerBroker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JLBHUDPConsumerBroker.class);
 
     private JLBH jlbh;
     private UDPProducerBroker udpProducerBroker;
@@ -28,7 +28,7 @@ public class JLBHUDPProducerBroker implements JLBHTask {
     public static void main(String[] args) {
         JLBHOptions jlbhOptions = new JLBHOptions()
                 .warmUpIterations(10_000).iterations(5_000_000).throughput(1_000_000).runs(3)
-                .accountForCoordinatedOmission(false).recordOSJitter(false).jlbhTask(new JLBHUDPProducerBroker());
+                .accountForCoordinatedOmission(false).recordOSJitter(false).jlbhTask(new JLBHUDPConsumerBroker());
 
         new JLBH(jlbhOptions).start();
     }
@@ -49,7 +49,7 @@ public class JLBHUDPProducerBroker implements JLBHTask {
 
     @Override
     public void run(long startTimeNS) {
-        udpProducerBroker.sendNext();
+        udpConsumerBroker.getNextAndAck();
         jlbh.sampleNanos((nanoTime() - 10) - startTimeNS);
     }
 
@@ -57,7 +57,7 @@ public class JLBHUDPProducerBroker implements JLBHTask {
     private void initialize() {
         new Thread(() -> udpQueueProducer.produce()).start();
         new Thread(() -> udpQueueConsumer.consume()).start();
-        new Thread(() -> udpConsumerBroker.startBroker()).start();
+        new Thread(() -> udpProducerBroker.startBroker()).start();
     }
 
 }
