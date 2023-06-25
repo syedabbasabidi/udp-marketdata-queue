@@ -45,22 +45,26 @@ public class UDPConsumerBroker {
     public void process() {
 
         while (true) {
-            try {
-                socket.receive(mdPacket);
-                if (mdPacket.getData() != null) {
-                    marketDataCons.setData(mdPacket.getData());
-                    ackPacket.setData(byteUtils.longToBytes(marketDataCons.getId()));
+            getNextAndAck();
+        }
+    }
 
-                    if (circularMMFQueue.add(mdPacket.getData())) {
-                        LOG.info("{} Msg enqueued {}, sending ack", ++msgCount, marketDataCons);
-                        socket.send(ackPacket);
-                    } else {
-                        LOG.info("Can't accept msg, queue is full");
-                    }
+    public void getNextAndAck() {
+        try {
+            socket.receive(mdPacket);
+            if (mdPacket.getData() != null) {
+                marketDataCons.setData(mdPacket.getData());
+                ackPacket.setData(byteUtils.longToBytes(marketDataCons.getId()));
+
+                if (circularMMFQueue.add(mdPacket.getData())) {
+                    LOG.info("{} Msg enqueued {}, sending ack", ++msgCount, marketDataCons);
+                    socket.send(ackPacket);
+                } else {
+                    LOG.info("Can't accept msg, queue is full");
                 }
-            } catch (Exception exp) {
-                LOG.error("Failed to receive msg", exp);
             }
+        } catch (Exception exp) {
+            LOG.error("Failed to receive msg", exp);
         }
     }
 }
