@@ -83,10 +83,6 @@ public class TCPProducerBroker {
         }
     }
 
-    private byte[] extractMsgId() {
-        return byteUtils.longToBytes(marketDataCons.getId());
-    }
-
     private long idFromAck() {
         return byteUtils.bytesToLong(ackbytes, 0, 8);
     }
