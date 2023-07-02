@@ -50,7 +50,7 @@ public class TCPProducerBroker {
         }).start();
     }
 
-    public void startBroker() throws IOException {
+    public void startBroker() {
         while (true) {
             sendNext();
         }

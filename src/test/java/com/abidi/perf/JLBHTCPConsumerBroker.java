@@ -1,5 +1,7 @@
 package com.abidi.perf;
 
+import com.abidi.broker.TCPConsumerBroker;
+import com.abidi.broker.TCPProducerBroker;
 import com.abidi.broker.UDPConsumerBroker;
 import com.abidi.broker.UDPProducerBroker;
 import com.abidi.consumer.UDPQueueConsumer;
@@ -19,9 +21,9 @@ public class JLBHTCPConsumerBroker implements JLBHTask {
     private static final Logger LOG = LoggerFactory.getLogger(JLBHTCPConsumerBroker.class);
 
     private JLBH jlbh;
-    private UDPProducerBroker udpProducerBroker;
+    private TCPProducerBroker tcpProducerBroker;
     private UDPQueueConsumer udpQueueConsumer;
-    private UDPConsumerBroker udpConsumerBroker;
+    private TCPConsumerBroker tcpConsumerBroker;
     private UDPQueueProducer udpQueueProducer;
 
 
@@ -37,8 +39,8 @@ public class JLBHTCPConsumerBroker implements JLBHTask {
     public void init(JLBH jlbh) {
         this.jlbh = jlbh;
         try {
-            udpConsumerBroker = new UDPConsumerBroker();
-            udpProducerBroker = new UDPProducerBroker();
+            tcpConsumerBroker = new TCPConsumerBroker();
+            tcpProducerBroker = new TCPProducerBroker();
             udpQueueConsumer = new UDPQueueConsumer();
             udpQueueProducer = new UDPQueueProducer();
             initialize();
@@ -49,7 +51,7 @@ public class JLBHTCPConsumerBroker implements JLBHTask {
 
     @Override
     public void run(long startTimeNS) {
-        udpConsumerBroker.getNextAndAck();
+        tcpConsumerBroker.getNextAndAck();
         jlbh.sampleNanos((nanoTime() - 10) - startTimeNS);
     }
 
@@ -57,7 +59,7 @@ public class JLBHTCPConsumerBroker implements JLBHTask {
     private void initialize() {
         new Thread(() -> udpQueueProducer.produce()).start();
         new Thread(() -> udpQueueConsumer.consume()).start();
-        new Thread(() -> udpProducerBroker.startBroker()).start();
+        new Thread(() -> tcpProducerBroker.startBroker()).start();
     }
 
 }
