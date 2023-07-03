@@ -39,8 +39,9 @@ public class JLBHTCPConsumerBroker implements JLBHTask {
     public void init(JLBH jlbh) {
         this.jlbh = jlbh;
         try {
-            tcpConsumerBroker = new TCPConsumerBroker();
             tcpProducerBroker = new TCPProducerBroker();
+            tcpProducerBroker.init();
+            tcpConsumerBroker = new TCPConsumerBroker();
             udpQueueConsumer = new UDPQueueConsumer();
             udpQueueProducer = new UDPQueueProducer();
             initialize();
