@@ -1,7 +1,7 @@
 package com.abidi.perf;
 
-import com.abidi.broker.TCPConsumerBroker;
-import com.abidi.broker.TCPProducerBroker;
+import com.abidi.broker.tcp.TCPConsumerBroker;
+import com.abidi.broker.tcp.TCPProducerBroker;
 import com.abidi.consumer.QueueConsumer;
 import com.abidi.producer.QueueProducer;
 import net.openhft.chronicle.jlbh.JLBH;
