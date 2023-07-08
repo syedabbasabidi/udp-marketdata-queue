@@ -1,7 +1,7 @@
 package com.abidi.consumer;
 
 import com.abidi.marketdata.model.MarketDataCons;
-import com.abidi.producer.UDPQueueProducer;
+import com.abidi.producer.QueueProducer;
 import com.abidi.queue.CircularMMFQueue;
 import com.abidi.util.ByteUtils;
 import org.slf4j.Logger;
@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class UDPQueueConsumer {
+public class QueueConsumer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UDPQueueProducer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(QueueProducer.class);
     public static final int QUEUE_SIZE = 1_000_000;
     private final MarketDataCons marketData;
     private final CircularMMFQueue mmfQueue;
 
-    public UDPQueueConsumer() throws IOException {
+    public QueueConsumer() throws IOException {
         ByteUtils byteUtils = new ByteUtils();
         marketData = new MarketDataCons(byteUtils);
         mmfQueue = new CircularMMFQueue(marketData.size(), QUEUE_SIZE, "/tmp/consumer");
@@ -24,8 +24,8 @@ public class UDPQueueConsumer {
 
     public static void main(String[] args) throws IOException {
         LOG.info("Starting Market Data Consumer...");
-        UDPQueueConsumer udpQueueConsumer = new UDPQueueConsumer();
-        udpQueueConsumer.consume();
+        QueueConsumer queueConsumer = new QueueConsumer();
+        queueConsumer.consume();
     }
 
     public void consume() {

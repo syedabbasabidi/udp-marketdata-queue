@@ -6,11 +6,10 @@ import com.abidi.util.ByteUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
+import static com.abidi.consumer.QueueConsumer.QUEUE_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class TCPProducerBroker {

@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
+import static com.abidi.consumer.QueueConsumer.QUEUE_SIZE;
 
 public class TCPConsumerBroker {
 

@@ -2,10 +2,8 @@ package com.abidi.perf;
 
 import com.abidi.broker.TCPConsumerBroker;
 import com.abidi.broker.TCPProducerBroker;
-import com.abidi.broker.UDPConsumerBroker;
-import com.abidi.broker.UDPProducerBroker;
-import com.abidi.consumer.UDPQueueConsumer;
-import com.abidi.producer.UDPQueueProducer;
+import com.abidi.consumer.QueueConsumer;
+import com.abidi.producer.QueueProducer;
 import net.openhft.chronicle.jlbh.JLBH;
 import net.openhft.chronicle.jlbh.JLBHOptions;
 import net.openhft.chronicle.jlbh.JLBHTask;
@@ -22,9 +20,9 @@ public class JLBHTCPProducerBroker implements JLBHTask {
 
     private JLBH jlbh;
     private TCPProducerBroker udpProducerBroker;
-    private UDPQueueConsumer udpQueueConsumer;
+    private QueueConsumer queueConsumer;
     private TCPConsumerBroker udpConsumerBroker;
-    private UDPQueueProducer udpQueueProducer;
+    private QueueProducer queueProducer;
 
 
     public static void main(String[] args) {
@@ -42,8 +40,8 @@ public class JLBHTCPProducerBroker implements JLBHTask {
             udpProducerBroker = new TCPProducerBroker();
             udpProducerBroker.init();
             udpConsumerBroker = new TCPConsumerBroker();
-            udpQueueConsumer = new UDPQueueConsumer();
-            udpQueueProducer = new UDPQueueProducer();
+            queueConsumer = new QueueConsumer();
+            queueProducer = new QueueProducer();
             initialize();
         } catch (IOException exp) {
             LOG.error("Failed to initialize JLBH", exp);
@@ -58,8 +56,8 @@ public class JLBHTCPProducerBroker implements JLBHTask {
 
 
     private void initialize() {
-        new Thread(() -> udpQueueProducer.produce()).start();
-        new Thread(() -> udpQueueConsumer.consume()).start();
+        new Thread(() -> queueProducer.produce()).start();
+        new Thread(() -> queueConsumer.consume()).start();
         new Thread(() -> udpConsumerBroker.startBroker()).start();
     }
 

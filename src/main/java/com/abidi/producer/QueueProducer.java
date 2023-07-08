@@ -8,16 +8,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
+import static com.abidi.consumer.QueueConsumer.QUEUE_SIZE;
 
-public class UDPQueueProducer {
+public class QueueProducer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UDPQueueProducer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(QueueProducer.class);
     private final CircularMMFQueue mmfQueue;
     private final MarketData md;
 
 
-    public UDPQueueProducer() throws IOException {
+    public QueueProducer() throws IOException {
         ByteUtils byteUtils = new ByteUtils();
         md = new MarketData(byteUtils);
         mmfQueue = new CircularMMFQueue(md.size(), QUEUE_SIZE, "/tmp/producer");
@@ -26,8 +26,8 @@ public class UDPQueueProducer {
     public static void main(String[] args) throws IOException {
 
         LOG.info("Starting Market Data Generator...");
-        UDPQueueProducer udpQueueProducer = new UDPQueueProducer();
-        udpQueueProducer.produce();
+        QueueProducer queueProducer = new QueueProducer();
+        queueProducer.produce();
     }
 
     public void produce() {

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
-import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
+import static com.abidi.consumer.QueueConsumer.QUEUE_SIZE;
 import static java.net.InetAddress.getLocalHost;
 import static org.slf4j.LoggerFactory.getLogger;
 

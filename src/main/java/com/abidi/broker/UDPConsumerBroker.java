@@ -11,7 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import static com.abidi.consumer.UDPQueueConsumer.QUEUE_SIZE;
+import static com.abidi.consumer.QueueConsumer.QUEUE_SIZE;
 import static java.net.InetAddress.getLocalHost;
 
 public class UDPConsumerBroker {
