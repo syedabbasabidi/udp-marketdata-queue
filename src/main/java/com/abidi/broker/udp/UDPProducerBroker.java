@@ -19,19 +19,18 @@ public class UDPProducerBroker {
     private final CircularMMFQueue circularMMFQueue;
     private final DatagramSocket socket;
     private final DatagramPacket ackPacket;
-    private volatile DatagramPacket msgPacket;
-    private final byte[] bytes;
-    private final byte[] ackMsgSeq = new byte[8];
+    private final DatagramPacket msgPacket;
     private final ByteUtils byteUtils = new ByteUtils();
-    private MarketDataCons marketDataCons;
+    private final MarketDataCons marketDataCons;
 
     public UDPProducerBroker() throws IOException {
         marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/producer");
         socket = new DatagramSocket(5001);
         socket.setSoTimeout(5000);
-        bytes = new byte[marketDataCons.size()];
+        byte[] bytes = new byte[marketDataCons.size()];
         msgPacket = new DatagramPacket(bytes, marketDataCons.size(), getLocalHost(), 5000);
+        byte[] ackMsgSeq = new byte[8];
         ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), 5000);
     }
 

@@ -17,9 +17,7 @@ public class TCPProducerBroker {
     private static final Logger LOG = getLogger(TCPProducerBroker.class);
     private final CircularMMFQueue circularMMFQueue;
     private final ServerSocket serverSocket;
-    private final byte[] bytes;
     private final byte[] ackbytes;
-    private final byte[] ackMsgSeq = new byte[8];
     private final ByteUtils byteUtils = new ByteUtils();
     private volatile Socket clientSocket;
     private MarketDataCons marketDataCons;
@@ -27,7 +25,6 @@ public class TCPProducerBroker {
     public TCPProducerBroker() throws IOException {
         marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/producer");
-        bytes = new byte[marketDataCons.size()];
         ackbytes = new byte[marketDataCons.size()];
         serverSocket = new ServerSocket(5001);
         LOG.info("Server started... {}", serverSocket.getInetAddress());

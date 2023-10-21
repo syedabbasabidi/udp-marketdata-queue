@@ -16,7 +16,6 @@ public class QueueProducer {
     private final CircularMMFQueue mmfQueue;
     private final MarketData md;
 
-
     public QueueProducer() throws IOException {
         ByteUtils byteUtils = new ByteUtils();
         md = new MarketData(byteUtils);

@@ -19,9 +19,7 @@ public class UDPConsumerBroker {
     private static final Logger LOG = LoggerFactory.getLogger(UDPConsumerBroker.class);
     private final CircularMMFQueue circularMMFQueue;
     private final DatagramSocket socket;
-    private volatile DatagramPacket mdPacket;
-    private final byte[] bytes;
-    private final byte[] ackMsgSeq = new byte[8];
+    private final DatagramPacket mdPacket;
     private final DatagramPacket ackPacket;
     private final MarketDataCons marketDataCons;
     private long msgCount = 0;
@@ -32,8 +30,9 @@ public class UDPConsumerBroker {
         marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/consumer");
         socket = new DatagramSocket(5000, InetAddress.getLocalHost());
-        bytes = new byte[marketDataCons.size()];
+        byte[] bytes = new byte[marketDataCons.size()];
         mdPacket = new DatagramPacket(bytes, marketDataCons.size(), InetAddress.getLocalHost(), 5001);
+        byte[] ackMsgSeq = new byte[8];
         ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), 5001);
     }
 
