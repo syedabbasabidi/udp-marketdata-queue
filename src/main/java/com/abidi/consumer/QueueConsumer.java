@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static com.abidi.constants.Config.UNDERLYING_CONSUMER_QUEUE_PATH;
+
 public class QueueConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(QueueProducer.class);
@@ -19,7 +21,7 @@ public class QueueConsumer {
     public QueueConsumer() throws IOException {
         ByteUtils byteUtils = new ByteUtils();
         marketData = new MarketDataCons(byteUtils);
-        mmfQueue = new CircularMMFQueue(marketData.size(), QUEUE_SIZE, "/tmp/consumer");
+        mmfQueue = new CircularMMFQueue(marketData.size(), QUEUE_SIZE, UNDERLYING_CONSUMER_QUEUE_PATH);
     }
 
     public static void main(String[] args) throws IOException {
