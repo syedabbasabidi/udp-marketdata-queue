@@ -11,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import static com.abidi.constants.Config.*;
 import static com.abidi.consumer.QueueConsumer.QUEUE_SIZE;
 import static java.net.InetAddress.getLocalHost;
 
@@ -28,12 +29,12 @@ public class UDPConsumerBroker {
     public UDPConsumerBroker() throws IOException {
 
         marketDataCons = new MarketDataCons(byteUtils);
-        this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/consumer");
-        socket = new DatagramSocket(5000, InetAddress.getLocalHost());
+        this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, UNDERLYING_CONSUMER_QUEUE_PATH);
+        socket = new DatagramSocket(UDP_CON_BROKER_SOCKET_PORT, InetAddress.getLocalHost());
         byte[] bytes = new byte[marketDataCons.size()];
-        mdPacket = new DatagramPacket(bytes, marketDataCons.size(), InetAddress.getLocalHost(), 5001);
+        mdPacket = new DatagramPacket(bytes, marketDataCons.size(), InetAddress.getLocalHost(), UDP_PROD_BROKER_SOCKET_PORT);
         byte[] ackMsgSeq = new byte[8];
-        ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), 5001);
+        ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), UDP_PROD_BROKER_SOCKET_PORT);
     }
 
     public static void main(String[] args) throws IOException {

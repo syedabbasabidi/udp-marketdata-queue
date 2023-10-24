@@ -1,5 +1,6 @@
 package com.abidi.broker.tcp;
 
+import com.abidi.constants.Config;
 import com.abidi.marketdata.model.MarketDataCons;
 import com.abidi.queue.CircularMMFQueue;
 import com.abidi.util.ByteUtils;
@@ -12,6 +13,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import static com.abidi.constants.Config.UNDERLYING_CONSUMER_QUEUE_PATH;
 import static com.abidi.consumer.QueueConsumer.QUEUE_SIZE;
 
 public class TCPConsumerBroker {
@@ -30,8 +32,8 @@ public class TCPConsumerBroker {
     public TCPConsumerBroker() throws IOException {
 
         marketDataCons = new MarketDataCons(byteUtils);
-        this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/consumer");
-        socket = new Socket(InetAddress.getLocalHost(), 5001);
+        this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, UNDERLYING_CONSUMER_QUEUE_PATH);
+        socket = new Socket(InetAddress.getLocalHost(), Config.TCP_BROKER_SOCKET_PORT);
         inputStream = socket.getInputStream();
         outputStream = socket.getOutputStream();
         msgBytes = new byte[marketDataCons.size()];

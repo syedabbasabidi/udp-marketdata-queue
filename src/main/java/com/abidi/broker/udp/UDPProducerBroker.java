@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
+import static com.abidi.constants.Config.*;
 import static com.abidi.consumer.QueueConsumer.QUEUE_SIZE;
 import static java.net.InetAddress.getLocalHost;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -25,13 +26,13 @@ public class UDPProducerBroker {
 
     public UDPProducerBroker() throws IOException {
         marketDataCons = new MarketDataCons(byteUtils);
-        this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, "/tmp/producer");
-        socket = new DatagramSocket(5001);
+        this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, UNDERLYING_PRODUCER_QUEUE_PATH);
+        socket = new DatagramSocket(UDP_PROD_BROKER_SOCKET_PORT);
         socket.setSoTimeout(5000);
         byte[] bytes = new byte[marketDataCons.size()];
-        msgPacket = new DatagramPacket(bytes, marketDataCons.size(), getLocalHost(), 5000);
+        msgPacket = new DatagramPacket(bytes, marketDataCons.size(), getLocalHost(), UDP_CON_BROKER_SOCKET_PORT);
         byte[] ackMsgSeq = new byte[8];
-        ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), 5000);
+        ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), UDP_CON_BROKER_SOCKET_PORT);
     }
 
     public static void main(String[] args) throws IOException {
