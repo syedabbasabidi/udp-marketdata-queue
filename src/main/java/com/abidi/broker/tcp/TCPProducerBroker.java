@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import static com.abidi.constants.Config.UNDERLYING_CONSUMER_QUEUE_PATH;
 import static com.abidi.constants.Config.UNDERLYING_PRODUCER_QUEUE_PATH;
 import static com.abidi.consumer.QueueConsumer.QUEUE_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -29,7 +28,7 @@ public class TCPProducerBroker {
         marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, UNDERLYING_PRODUCER_QUEUE_PATH);
         ackbytes = new byte[marketDataCons.size()];
-        serverSocket = new ServerSocket(Config.TCP_BROKER_SOCKET_PORT);
+        serverSocket = new ServerSocket(Config.TCP_BROKER_SERVER_SOCKET_PORT);
         LOG.info("Server started... {}", serverSocket.getInetAddress());
     }
 

@@ -33,7 +33,7 @@ public class TCPConsumerBroker {
 
         marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, UNDERLYING_CONSUMER_QUEUE_PATH);
-        socket = new Socket(InetAddress.getLocalHost(), Config.TCP_BROKER_SOCKET_PORT);
+        socket = new Socket(InetAddress.getLocalHost(), Config.TCP_BROKER_SERVER_SOCKET_PORT, InetAddress.getLocalHost(), Config.TCP_BROKER_CLIENT_SOCKET_PORT);
         inputStream = socket.getInputStream();
         outputStream = socket.getOutputStream();
         msgBytes = new byte[marketDataCons.size()];
