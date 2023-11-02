@@ -27,7 +27,7 @@ public class JLBHUDPConsumerBroker implements JLBHTask {
 
     public static void main(String[] args) {
         JLBHOptions jlbhOptions = new JLBHOptions()
-                .warmUpIterations(10_000).iterations(5_000_000).throughput(1_000_000).runs(3)
+                .warmUpIterations(10_000).iterations(1_000_000).throughput(5_00_000).runs(3)
                 .accountForCoordinatedOmission(false).recordOSJitter(false).jlbhTask(new JLBHUDPConsumerBroker());
 
         new JLBH(jlbhOptions).start();
