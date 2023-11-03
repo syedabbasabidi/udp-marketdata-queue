@@ -56,9 +56,9 @@ public class JLBHTCPConsumerBroker implements JLBHTask {
 
 
     private void initialize() {
-        new Thread(() -> queueProducer.produce()).start();
-        new Thread(() -> queueConsumer.consume()).start();
-        new Thread(() -> tcpProducerBroker.startBroker()).start();
+        new Thread(() -> queueProducer.produce(), "Producer").start();
+        new Thread(() -> queueConsumer.consume(), "Consumer").start();
+        new Thread(() -> tcpProducerBroker.startBroker(), "ProducerBroker").start();
     }
 
 }
