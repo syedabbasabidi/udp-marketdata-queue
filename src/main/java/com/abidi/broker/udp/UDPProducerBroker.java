@@ -17,6 +17,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class UDPProducerBroker {
 
     private static final Logger LOG = getLogger(UDPProducerBroker.class);
+    public static final int SO_TIMEOUT = 5000;
     private final CircularMMFQueue circularMMFQueue;
     private final DatagramSocket socket;
     private final DatagramPacket ackPacket;
@@ -28,7 +29,7 @@ public class UDPProducerBroker {
         marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, UNDERLYING_PRODUCER_QUEUE_PATH);
         socket = new DatagramSocket(UDP_PROD_BROKER_SOCKET_PORT);
-        socket.setSoTimeout(5000);
+        socket.setSoTimeout(SO_TIMEOUT);
         byte[] bytes = new byte[marketDataCons.size()];
         msgPacket = new DatagramPacket(bytes, marketDataCons.size(), getLocalHost(), UDP_CON_BROKER_SOCKET_PORT);
         byte[] ackMsgSeq = new byte[8];
@@ -47,7 +48,7 @@ public class UDPProducerBroker {
     }
 
     public void sendNext() {
-        byte[] bytes = circularMMFQueue.getWithoutAck();
+        byte[] bytes = circularMMFQueue.getWithAck();
         if (bytes != null) sendItAcross(bytes);
     }
 

@@ -55,7 +55,7 @@ public class TCPProducerBroker {
     }
 
     public void sendNext() {
-        byte[] bytes = circularMMFQueue.getWithoutAck();
+        byte[] bytes = circularMMFQueue.getWithAck();
         if (bytes != null) sendItAcross(bytes);
     }
 
