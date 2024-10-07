@@ -31,10 +31,11 @@ public class UDPConsumerBroker {
         marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, UNDERLYING_CONSUMER_QUEUE_PATH);
         socket = new DatagramSocket(UDP_CON_BROKER_SOCKET_PORT, InetAddress.getLocalHost());
+
         byte[] bytes = new byte[marketDataCons.size()];
-        mdPacket = new DatagramPacket(bytes, marketDataCons.size(), InetAddress.getLocalHost(), UDP_PROD_BROKER_SOCKET_PORT);
+        mdPacket = new DatagramPacket(bytes, marketDataCons.size());
         byte[] ackMsgSeq = new byte[8];
-        ackPacket = new DatagramPacket(ackMsgSeq, 8, getLocalHost(), UDP_PROD_BROKER_SOCKET_PORT);
+        ackPacket = new DatagramPacket(ackMsgSeq, ackMsgSeq.length, getLocalHost(), UDP_PROD_BROKER_SOCKET_PORT);
     }
 
     public static void main(String[] args) throws IOException {
