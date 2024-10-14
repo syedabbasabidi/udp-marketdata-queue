@@ -61,11 +61,13 @@ public class UDPProducerBroker {
         while (true) {
             try {
 
-                LOG.info("Sending data {}", marketDataCons);
+                LOG.debug("Sending data {}", marketDataCons);
                 socket.send(msgPacket);
                 socket.receive(ackPacket);
                 if (idFromAck() == marketDataCons.getId()) {
-                    LOG.info("Ack for {} is received", marketDataCons.getId());
+                    if(LOG.isDebugEnabled()) {
+                        LOG.debug("Ack for {} is received", marketDataCons.getId());
+                    }
                     circularMMFQueue.ack();
                     break;
                 }

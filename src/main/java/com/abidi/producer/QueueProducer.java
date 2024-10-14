@@ -40,7 +40,9 @@ public class QueueProducer {
             md.setFirm(msgId % 2 == 0);
             md.setId(msgId);
             if (mmfQueue.add(md.getData())) {
-                LOG.info("Msg {} sent", msgId);
+                if(LOG.isDebugEnabled()) {
+                    LOG.debug("Msg {} sent", msgId);
+                }
                 msgId++;
             }
         }

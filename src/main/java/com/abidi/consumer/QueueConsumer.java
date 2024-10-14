@@ -37,7 +37,7 @@ public class QueueConsumer {
             byte[] bytes = mmfQueue.get();
             if (bytes != null) {
                 marketData.setData(bytes);
-                LOG.info("Message received {}", marketData);
+                LOG.debug("Message received {}", marketData);
             }
         }
     }
