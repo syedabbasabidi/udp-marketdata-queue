@@ -7,6 +7,7 @@ import com.abidi.util.ByteUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -28,24 +29,33 @@ public class TCPProducerBroker {
         marketDataCons = new MarketDataCons(byteUtils);
         this.circularMMFQueue = new CircularMMFQueue(marketDataCons.size(), QUEUE_SIZE, UNDERLYING_PRODUCER_QUEUE_PATH);
         ackbytes = new byte[marketDataCons.size()];
-        serverSocket = new ServerSocket(Config.TCP_BROKER_SERVER_SOCKET_PORT);
+        serverSocket = new ServerSocket(Config.TCP_BROKER_SERVER_SOCKET_PORT, 10, InetAddress.getByName("192.168.1.52"));
         LOG.info("Server started... {}", serverSocket.getInetAddress());
     }
 
     public static void main(String[] args) throws IOException {
         TCPProducerBroker udpProducerBroker = new TCPProducerBroker();
-        udpProducerBroker.startBroker();
+        udpProducerBroker.init();
+    }
+
+    public void initSynchronously() throws IOException {
+        startServer();
     }
 
     public void init() throws IOException {
         new Thread(() -> {
-            try {
-                clientSocket = serverSocket.accept();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            LOG.info("Consumer broker connected!");
+            startServer();
+            startBroker();
         }).start();
+    }
+
+    private void startServer() {
+        try {
+            clientSocket = serverSocket.accept();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        LOG.info("Consumer broker connected!");
     }
 
     public void startBroker() {

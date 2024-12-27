@@ -3,6 +3,7 @@ package com.abidi.producer;
 import com.abidi.marketdata.model.MarketData;
 import com.abidi.queue.CircularMMFQueue;
 import com.abidi.util.ByteUtils;
+import com.abidi.util.ChecksumUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ public class QueueProducer {
 
     public QueueProducer() throws IOException {
         ByteUtils byteUtils = new ByteUtils();
-        md = new MarketData(byteUtils);
+        md = new MarketData(byteUtils, new ChecksumUtil());
         mmfQueue = new CircularMMFQueue(md.size(), QUEUE_SIZE, UNDERLYING_PRODUCER_QUEUE_PATH);
     }
 
